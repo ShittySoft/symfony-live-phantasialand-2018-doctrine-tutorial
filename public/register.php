@@ -6,6 +6,7 @@ use Authentication\Entity\User;
 use Authentication\Notification\NotifyUserOfRegistration;
 use Authentication\ReadModel\UserExists;
 use Authentication\Repository\Users;
+use Authentication\Value\ClearTextPassword;
 use Authentication\Value\EmailAddress;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -29,7 +30,7 @@ $users = new class implements Users {
 
 $users->store(User::register(
     EmailAddress::for($_POST['emailAddress']),
-    $_POST['password'],
+    ClearTextPassword::fromPassword($_POST['password']),
     new class ($users) implements UserExists {
         /**
          * @var Users

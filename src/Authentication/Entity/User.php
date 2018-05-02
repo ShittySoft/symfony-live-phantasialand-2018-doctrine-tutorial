@@ -4,12 +4,17 @@ namespace Authentication\Entity;
 
 use Authentication\Notification\NotifyUserOfRegistration;
 use Authentication\ReadModel\UserExists;
+use Authentication\Value\ClearTextPassword;
 use Authentication\Value\EmailAddress;
+use Authentication\Value\PasswordHash;
 
 class User
 {
     /** @var EmailAddress */
     private $emailAddress;
+
+    /** @var PasswordHash */
+    private $passwordHash;
 
     private function __construct()
     {
@@ -22,7 +27,7 @@ class User
 
     public static function register(
         EmailAddress $emailAddress,
-        string $clearTextPassword,
+        ClearTextPassword $clearTextPassword,
         UserExists $userExists,
         NotifyUserOfRegistration $notify
     ) : self {
@@ -36,11 +41,7 @@ class User
         $user = new self();
 
         $user->emailAddress = $emailAddress;
-        $user->passwordHash = password_hash($clearTextPassword, \PASSWORD_DEFAULT);
-
-        if (! \is_string($user->passwordHash)) {
-            throw new \RuntimeException('Couldn\'t hash the damn password, and PHP is a shitty language');
-        }
+        $user->passwordHash = PasswordHash::fromClearText($clearTextPassword);
 
         $notify->__invoke($user);
 
