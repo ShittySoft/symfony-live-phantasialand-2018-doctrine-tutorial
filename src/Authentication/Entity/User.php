@@ -10,7 +10,7 @@ use Authentication\Value\PasswordHash;
 
 class User
 {
-    /** @var EmailAddress */
+    /** @var string */
     private $emailAddress;
 
     /** @var PasswordHash */
@@ -22,7 +22,7 @@ class User
 
     public function id() : EmailAddress
     {
-        return $this->emailAddress;
+        return EmailAddress::for($this->emailAddress);
     }
 
     public static function register(
@@ -40,7 +40,7 @@ class User
 
         $user = new self();
 
-        $user->emailAddress = $emailAddress;
+        $user->emailAddress = $emailAddress->toString();
         $user->passwordHash = PasswordHash::fromClearText($clearTextPassword);
 
         $notify->__invoke($user);
