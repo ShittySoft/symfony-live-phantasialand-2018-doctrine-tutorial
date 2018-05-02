@@ -4,35 +4,32 @@ namespace Authentication\Entity;
 
 use Authentication\Notification\NotifyUserOfRegistration;
 use Authentication\ReadModel\UserExists;
+use Authentication\Value\EmailAddress;
 
 class User
 {
+    /** @var EmailAddress */
+    private $emailAddress;
+
     private function __construct()
     {
     }
 
-    public function id() : string
+    public function id() : EmailAddress
     {
         return $this->emailAddress;
     }
 
     public static function register(
-        string $emailAddress,
+        EmailAddress $emailAddress,
         string $clearTextPassword,
         UserExists $userExists,
         NotifyUserOfRegistration $notify
     ) : self {
-        if (! filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Email address "%s" is in an invalid format',
-                $emailAddress
-            ));
-        }
-
         if ($userExists->__invoke($emailAddress)) {
             throw new \InvalidArgumentException(\sprintf(
                 'User with email address "%s" already exists',
-                $emailAddress
+                $emailAddress->toString()
             ));
         }
 

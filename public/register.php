@@ -6,28 +6,29 @@ use Authentication\Entity\User;
 use Authentication\Notification\NotifyUserOfRegistration;
 use Authentication\ReadModel\UserExists;
 use Authentication\Repository\Users;
+use Authentication\Value\EmailAddress;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $users = new class implements Users {
-    public function get(string $emailAddress) : User
+    public function get(EmailAddress $emailAddress) : User
     {
         return unserialize(file_get_contents(
-            __DIR__ . '/../data/' . $emailAddress . '.user.txt'
+            __DIR__ . '/../data/' . $emailAddress->toString() . '.user.txt'
         ));
     }
 
     public function store(User $user) : void
     {
         file_put_contents(
-            __DIR__ . '/../data/' . $user->id() . '.user.txt',
+            __DIR__ . '/../data/' . $user->id()->toString() . '.user.txt',
             serialize($user)
         );
     }
 };
 
 $users->store(User::register(
-    $_POST['emailAddress'],
+    EmailAddress::for($_POST['emailAddress']),
     $_POST['password'],
     new class ($users) implements UserExists {
         /**
@@ -40,7 +41,7 @@ $users->store(User::register(
             $this->users = $users;
         }
 
-        public function __invoke(string $username) : bool
+        public function __invoke(EmailAddress $username) : bool
         {
             try {
                 return (bool) $this->users->get($username);
@@ -52,7 +53,7 @@ $users->store(User::register(
     new class implements NotifyUserOfRegistration {
         public function __invoke(User $user) : void
         {
-            error_log($user->id() . ' registered!');
+            error_log($user->id()->toString() . ' registered!');
         }
     }
 ));
