@@ -47,4 +47,9 @@ class User
 
         return $user;
     }
+
+    public function logIn(ClearTextPassword $password) : bool
+    {
+        return $this->passwordHash->matches($password);
+    }
 }

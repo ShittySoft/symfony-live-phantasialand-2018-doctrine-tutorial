@@ -31,6 +31,11 @@ final class PasswordHash
         return $instance;
     }
 
+    public function matches(ClearTextPassword $password) : bool
+    {
+        return password_verify($password->toString(), $this->hash);
+    }
+
     public function toString() : string
     {
         return $this->hash;
